@@ -65,7 +65,7 @@ app.post('/download-records', (req, res) => {
     recordsDB.find({}, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         // Convert records to CSV
-        const fields = ['name', 'pin', 'action', 'time', 'ip'];
+        const fields = ['name', 'pin', 'action', 'time', 'ip', 'US'];
         const opts = { fields };
         const csv = json2csv(rows, opts);
         // Set the response header

@@ -13,7 +13,7 @@ interface TimeCardProps {
   records: Record[];
 }
 
-const TimeCard: React.FC<TimeCardProps> = ({ records }) => {
+  const TimeCard: React.FC<TimeCardProps> = ({ records }) => {
   const groupedRecords: { [pin: string]: { name: string; records: Record[] } } = {};
   const uniqueIps: { [pin: string]: Set<string> } = {};
 
@@ -46,6 +46,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ records }) => {
                 <th>Action</th>
                 <th>Time</th>
                 <th>IP</th>
+                <th>Unidade sanitaria</th>
               </tr>
             </thead>
             <tbody>
@@ -56,6 +57,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ records }) => {
                   <td style={{ backgroundColor: uniqueIps[pin].size > 1 ? 'yellow' : 'transparent' }}>
                     {record.ip}
                   </td>
+                  <td>CS Albasine</td>
                 </tr>
               ))}
             </tbody>

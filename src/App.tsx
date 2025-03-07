@@ -153,69 +153,129 @@ const App: React.FC = () => {
       return;
     }
 
-    // Implementing the clock-in/clock-out logic
-    const lastAction = employeeStatus[pin];
-    if (
-      (selectedAction === 'clockIn' && lastAction !== 'clockOut' && lastAction !== undefined) ||
-      (selectedAction === 'clockOut' && (lastAction !== 'clockIn' && lastAction !== 'endBreak')) ||
-      (selectedAction === 'startBreak' && lastAction !== 'clockIn') ||
-      (selectedAction === 'endBreak' && lastAction !== 'startBreak')
-    ) {
-      let message = `Invalid action: ${selectedAction}, Last Action: ${lastAction}`;
-      if (selectedAction === 'clockOut' && !lastAction) message = 'You must clock in before you can clock out';
-      if (selectedAction === 'startBreak' && !lastAction) message = 'You must clock in before you can start a break';
-      if (selectedAction === 'endBreak' && !lastAction) message = 'You must start a break before you can end it';
-      showMessageToUser(message, 'error');
-      return;
-    }
+  //   // Implementing the clock-in/clock-out logic
+  //   const lastAction = employeeStatus[pin];
+  //   if (
+  //     (selectedAction === 'clockIn' && lastAction !== 'clockOut' && lastAction !== undefined) ||
+  //     (selectedAction === 'clockOut' && (lastAction !== 'clockIn' && lastAction !== 'endBreak')) ||
+  //     (selectedAction === 'startBreak' && lastAction !== 'clockIn') ||
+  //     (selectedAction === 'endBreak' && lastAction !== 'startBreak')
+  //   ) {
+  //     let message = `Invalid action: ${selectedAction}, Last Action: ${lastAction}`;
+  //     if (selectedAction === 'clockOut' && !lastAction) message = 'You must clock in before you can clock out';
+  //     if (selectedAction === 'startBreak' && !lastAction) message = 'You must clock in before you can start a break';
+  //     if (selectedAction === 'endBreak' && !lastAction) message = 'You must start a break before you can end it';
+  //     showMessageToUser(message, 'error');
+  //     return;
+  //   }
 
-    const record = { action: selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1), time: currentTime };
+  //   const record = { action: selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1), time: currentTime };
 
-    let ipResponse = await fetch('https://api.ipify.org?format=json');
-    let ipData = await ipResponse.json();
-    let ip = ipData.ip;
+  //   let ipResponse = await fetch('https://api.ipify.org?format=json');
+  //   let ipData = await ipResponse.json();
+  //   let ip = ipData.ip;
 
-    fetch('/add-record', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin, action: record.action, time: record.time, ip: ip })
-    })
-      .then((response) => {
-        if (!response.ok) return response.json().then((error) => Promise.reject(error));
-        return response.json();
-      })
-      .then((data) => {
-        // Success, update the last action for this PIN
-        setEmployeeStatus({
-          ...employeeStatus,
-          [pin]: selectedAction,
-        });
-        setTimeCardRecords([...timeCardRecords, { id: data.id, name: data.name, pin, action: record.action, time: record.time, ip: ip }]);
-        setPin(''); // Clearing the PIN
-        showMessageToUser('Time recorded successfully', 'success');
-      })
-      .catch((error) => {
-        console.error('Error adding record:', error.error);
-        showMessageToUser('Error adding record: ' + error.error, 'error');
-      });
-  };
+  //   fetch('/add-record', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ pin, action: record.action, time: record.time, ip: ip })
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) return response.json().then((error) => Promise.reject(error));
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       // Success, update the last action for this PIN
+  //       setEmployeeStatus({
+  //         ...employeeStatus,
+  //         [pin]: selectedAction,
+  //       });
+  //       setTimeCardRecords([...timeCardRecords, { id: data.id, name: data.name, pin, action: record.action, time: record.time, ip: ip }]);
+  //       setPin(''); // Clearing the PIN
+  //       showMessageToUser('Time recorded successfully', 'success');
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error adding record:', error.error);
+  //       showMessageToUser('Error adding record: ' + error.error, 'error');
+  //     });
+  // };
 
-  function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' | 'info') {
-    const messageContainer = document.getElementById('message-container');
-    const message = document.createElement('p');
-    message.classList.add(`${type}-message`);
-    message.textContent = text;
-    messageContainer?.appendChild(message);
+  // function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' | 'info') {
+  //   const messageContainer = document.getElementById('message-container');
+  //   const message = document.createElement('p');
+  //   message.classList.add(`${type}-message`);
+  //   message.textContent = text;
+  //   messageContainer?.appendChild(message);
 
-    // Add the "show" class to make the message appear
-    message.classList.add('show');
+  //   // Add the "show" class to make the message appear
+  //   message.classList.add('show');
 
-    // Remove the message after 3 seconds
-    setTimeout(() => {
-      message.classList.add('hide');
-      setTimeout(() => { messageContainer?.removeChild(message); }, 1000);
-    }, 3000);
-  }
+  //   // Remove the message after 3 seconds
+  //   setTimeout(() => {
+  //     message.classList.add('hide');
+  //     setTimeout(() => { messageContainer?.removeChild(message); }, 1000);
+  //   }, 3000);
+  // }
+  // Implementing the clock-in/clock-out logic
+const lastAction = employeeStatus[pin];
+
+// Remove or modify the validation check based on the last action
+// Allowing all actions regardless of the last action
+// Just validate if the selected action exists (this is optional depending on the action structure)
+
+if (!selectedAction) {
+  showMessageToUser('Invalid action', 'error');
+  return;
+}
+
+const record = { action: selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1), time: currentTime };
+
+let ipResponse = await fetch('https://api.ipify.org?format=json');
+let ipData = await ipResponse.json();
+let ip = ipData.ip;
+
+fetch('/add-record', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ pin, action: record.action, time: record.time, ip: ip })
+})
+  .then((response) => {
+    if (!response.ok) return response.json().then((error) => Promise.reject(error));
+    return response.json();
+  })
+  .then((data) => {
+    // Success, update the last action for this PIN
+    setEmployeeStatus({
+      ...employeeStatus,
+      [pin]: selectedAction,
+    });
+    setTimeCardRecords([...timeCardRecords, { id: data.id, name: data.name, pin, action: record.action, time: record.time, ip: ip }]);
+    setPin(''); // Clearing the PIN
+    showMessageToUser('Time recorded successfully', 'success');
+  })
+  .catch((error) => {
+    console.error('Error adding record:', error.error);
+    showMessageToUser('Error adding record: ' + error.error, 'error');
+  });
+};
+
+function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' | 'info') {
+  const messageContainer = document.getElementById('message-container');
+  const message = document.createElement('p');
+  message.classList.add(`${type}-message`);
+  message.textContent = text;
+  messageContainer?.appendChild(message);
+
+  // Add the "show" class to make the message appear
+  message.classList.add('show');
+
+  // Remove the message after 3 seconds
+  setTimeout(() => {
+    message.classList.add('hide');
+    setTimeout(() => { messageContainer?.removeChild(message); }, 1000);
+  }, 3000);
+}
+
 
   function downloadRecords() {
     fetch('/download-records', { method: 'POST' })
