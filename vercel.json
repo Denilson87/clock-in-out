@@ -1,6 +1,6 @@
 {
     "scripts": {
-      "build": "react-scripts build"
+      "build": "react build"
     }
   }
   
