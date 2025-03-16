@@ -12,13 +12,19 @@ const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false); // State to control showing login
   const [showLoginButton, setShowLoginButton] = useState(false); // State to control showing login button
   const [showCreateAdmin, setShowCreateAdmin] = useState(false); // State to control showing createAdmin
-  const [pin, setPin] = useState(''); // State to store the PIN
+  // const [pin, setPin] = useState(''); // State to store the PIN
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString()); // State to store the current time
   const [showAddEmployee, setShowAddEmployee] = useState(false); // State to control showing addEmployee
   const [timeCardRecords, setTimeCardRecords] = useState<{ id: number; name: string; pin: string; action: string; time: string; ip: string }[]>([]);  // State to store the time card records
   const [employeeStatus, setEmployeeStatus] = useState<{ [pin: string]: string }>({}); // State to store the employee status
   const isOverlayShowing = showCreateAdmin || showLogin || showAddEmployee; // State to check if an overlay is showing
   const [lastInteractionTime, setLastInteractionTime] = useState(new Date()); // State to track the last interaction time
+
+
+  const [pin, setPin] = useState(() => {
+    // Retrieve the pin from localStorage when the component loads
+    return localStorage.getItem("userPin") || "";
+  });
 
   // Effect to update the current time every second
   useEffect(() => {
@@ -29,6 +35,13 @@ const App: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    // Save the pin to localStorage whenever it changes
+    if (pin) {
+      localStorage.setItem("userPin", pin);
+    }
+  }, [pin]);
+  
   // Effect to check if the user is logged in
   useEffect(() => {
     fetch('/is-logged-in')
@@ -141,7 +154,7 @@ const App: React.FC = () => {
     setPin(''); // Clear the entire PIN
   };
 
-  const handleActionClick = async (selectedAction: 'clockIn' | 'clockOut' | 'startBreak' | 'endBreak') => {
+  const handleActionClick = async (selectedAction: 'Entrada' | 'Saida' | 'startBreak' | 'endBreak') => {
     // Flash red and exit early if no PIN is entered
     if (pin === '') {
       document.body.scrollTo(0, 0); // scroll up
@@ -318,14 +331,24 @@ function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' |
 
   // Return the JSX
   return (
+    
     <div className="time-clock-container" ref={timeClockContainerRef} onKeyDown={handleKeyDown} tabIndex={0}>
       <Login showLogin={showLogin} onLoginSuccess={onLoginSuccess} onCloseOverlay={onCloseOverlay} />
       {showAddEmployee && isLoggedIn && <AddEmployee onAddSuccess={onAddEmployeeSuccess} onCloseOverlay={onCloseOverlay} />}
       {showCreateAdmin && !isLoggedIn && <CreateAdmin onCreateSuccess={onCreateAdminSuccess} onCloseOverlay={onCloseOverlay} />}
-      <h1>Employee Time Clock</h1>
-      <div id="currentTime">Current Time: {currentTime}</div>
+      <div style={{ textAlign: 'center', padding: '20px' }}>
+      <img src={require("./assets/main.png")} alt="logo" width="300" />
+      </div>     
+      <h2>Controle de assiduidade</h2>
+      <div id="currentTime"><b>Horario local: {currentTime}</b></div>
       <div className="pin-entry">
-        <div id="currentPin">Enter Your PIN: {pin}</div>
+      <input
+        type="password"
+        value={pin}
+        onChange={(e) => setPin(e.target.value)}
+        placeholder="Enter your PIN"
+      />
+      <div id="currentPin">Digite o seu PIN: {"*".repeat(pin.length)}</div>
         <button className="clear-button" onClick={handleClear}>Clear</button>
       </div>
       <div id="message-container"></div>
@@ -333,17 +356,15 @@ function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' |
         <Keypad onKeyPress={handleKeyPress} />
       </div>
       <div className="action-buttons">
-        <button onClick={() => handleActionClick('clockIn')}>Clock In</button>
-        <button onClick={() => handleActionClick('clockOut')}>Clock Out</button>
-        <button onClick={() => handleActionClick('startBreak')}>Start Break</button>
-        <button onClick={() => handleActionClick('endBreak')}>End Break</button>
-      </div>
+        <button onClick={() => handleActionClick('Entrada')}>Entrada</button>
+        <button onClick={() => handleActionClick('Saida')}>Saida</button>
+        </div>
       {showLoginButton && !isLoggedIn && <button id="loginButton" onClick={() => setShowLogin(true)}>
-        Login como administrator to see and download time cards</button>}
+        Login como administrator</button>}
       {isLoggedIn && <hr></hr>}
       {isLoggedIn && <TimeCard records={timeCardRecords} />}
-      {!isOverlayShowing && isLoggedIn && <button id="downloadButton" onClick={() => { downloadRecords(); }}>Download All Records</button>}
-      {!isOverlayShowing && isLoggedIn && <button id="addEmployeeButton" onClick={() => { setShowAddEmployee(true) }}>Add New Employee</button>}
+      {!isOverlayShowing && isLoggedIn && <button id="downloadButton" onClick={() => { downloadRecords(); }}>Baixar dados XLS</button>}
+      {!isOverlayShowing && isLoggedIn && <button id="addEmployeeButton" onClick={() => { setShowAddEmployee(true) }}>Adicionar colaborador</button>}
       {!isOverlayShowing && isLoggedIn && <button id="logoutButton" onClick={() => { setShowLoginButton(true); setIsLoggedIn(false); }}>Logout</button>}
     </div>
   );

@@ -1,3 +1,4 @@
+const os = require('os');
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
@@ -65,6 +66,7 @@ app.post('/download-records', (req, res) => {
     recordsDB.find({}, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         // Convert records to CSV
+        const US=" CS Albasine"
         const fields = ['name', 'pin', 'action', 'time', 'ip', 'US'];
         const opts = { fields };
         const csv = json2csv(rows, opts);
@@ -75,25 +77,66 @@ app.post('/download-records', (req, res) => {
     });
 });
 
-// Route to add record
+// // Route to add record
+// app.post('/add-record', (req, res) => {
+//     const { pin, action, time, ip } = req.body;
+//     // Check if a user with the provided PIN exists
+//     usersDB.findOne({ pin }, (err, user) => {
+//         if (err) return res.status(500).json({ error: err.message });
+//         if (!user) return res.status(400).json({ error: 'Nenhum utiizador com esse PIN' });
+//         // Find the name associated with the PIN
+//         const name = user.name;
+//         // Insert the new record along with the IP
+//         recordsDB.insert({ name, pin, action, time, ip }, (err, newRecord) => {
+//             if (err) return res.status(500).json({ error: err.message });
+
+//             // Return the new record ID and name
+//             res.status(201).json({ id: newRecord._id, name });
+//         });
+//     });
+// });
+
+
+// Função para capturar o MAC Address
+function getMacAddress() {
+    const interfaces = os.networkInterfaces();
+    for (let iface in interfaces) {
+        for (let info of interfaces[iface]) {
+            if (info.mac && info.mac !== '00:00:00:00:00:00') {
+                return info.mac; // Retorna o primeiro MAC Address encontrado
+            }
+        }
+    }
+    return "MAC Address não encontrado";
+}    console.log("MAC Address não encontrado");
+
+
+// Rota para adicionar registro
 app.post('/add-record', (req, res) => {
-    const { pin, action, time, ip } = req.body;
-    // Check if a user with the provided PIN exists
+    const { pin, action, time, ip, us } = req.body;
+
+    // Capturar o MAC Address
+    const macAddress = getMacAddress();
+    console.log("MAC Address do dispositivo:", macAddress); // Exibir o MAC Address no console
+
+    // Verificar se o usuário com o PIN fornecido existe
     usersDB.findOne({ pin }, (err, user) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (!user) return res.status(400).json({ error: 'No user with this PIN' });
-        // Find the name associated with the PIN
+        if (!user) return res.status(400).json({ error: 'Nenhum utilizador com esse PIN' });
+
+        // Nome do usuário
         const name = user.name;
-        // Insert the new record along with the IP
-        recordsDB.insert({ name, pin, action, time, ip }, (err, newRecord) => {
+        const us = "CS Albasine ";
+
+        // Inserir o novo registro com MAC Address
+        recordsDB.insert({ name, pin, action, time, ip, us,  mac: macAddress }, (err, newRecord) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            // Return the new record ID and name
+            // Retornar o novo ID e nome
             res.status(201).json({ id: newRecord._id, name });
         });
     });
 });
-
 // Route to login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -101,9 +144,9 @@ app.post('/login', (req, res) => {
     usersDB.findOne({ username }, (err, user) => {
         if (err) return res.status(500).json({ error: err.message });
         // Verify password
-        if (!user) return res.status(401).json({ error: 'No user with those credentials' });
+        if (!user) return res.status(401).json({ error: 'Usario não encontrado !' });
         const passwordIsValid = bcrypt.compareSync(password, user.password);
-        if (!passwordIsValid) return res.status(401).json({ error: 'Invalid credentials' });
+        if (!passwordIsValid) return res.status(401).json({ error: 'Credenciais erradas !' });
 
         // Set admin flag in session
         req.session.admin = true;
@@ -134,7 +177,7 @@ app.post('/add-admin', (req, res) => {
     // Check if username already exists
     usersDB.findOne({ username }, (err, existingUser) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (existingUser) return res.status(400).json({ error: 'Username already exists' });
+        if (existingUser) return res.status(400).json({ error: 'Este Utilizador ja existe' });
         // Hash the password
         const hashedPassword = bcrypt.hashSync(password, 8);
         // Generate a login token
@@ -154,7 +197,7 @@ app.post('/add-employee', (req, res) => {
     // Check if PIN already exists
     usersDB.findOne({ pin }, (err, existingEmployee) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (existingEmployee) return res.status(400).json({ error: 'PIN already exists' });
+        if (existingEmployee) return res.status(400).json({ error: 'Pin invalido !' });
         // Logic to add employee to the database
         usersDB.insert({ name, pin }, (err, newEmployee) => {
             if (err) return res.status(500).json({ error: err.message });

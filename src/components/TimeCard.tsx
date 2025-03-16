@@ -43,8 +43,8 @@ interface TimeCardProps {
           <table>
             <thead>
               <tr>
-                <th>Action</th>
-                <th>Time</th>
+                <th>Acção</th>
+                <th>Data-Hora</th>
                 <th>IP</th>
                 <th>Unidade sanitaria</th>
               </tr>

@@ -16,11 +16,11 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onAddSuccess, onCloseOverlay 
 
   const handleAddEmployee = async () => {
     if (name.length < MIN_NAME_LENGTH) {
-      setError(`Name must be at least ${MIN_NAME_LENGTH} characters long`);
+      setError(`Nome deve ter  ${MIN_NAME_LENGTH} caracteres`);
       return;
     }
     if (pin.length !== PIN_LENGTH) {
-      setError(`PIN must be exactly ${PIN_LENGTH} digits long`);
+      setError(`PIN deve ser exacto ${PIN_LENGTH} .`);
       return;
     }
 
@@ -34,17 +34,17 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onAddSuccess, onCloseOverlay 
         if (data.id) {
           onAddSuccess();
         } else {
-          setError('Error adding employee: ' + data.error);
+          setError('Error adicionando colaborador: ' + data.error);
         }
       })
-      .catch((error) => setError('Error adding employee: ' + error));
+      .catch((error) => setError('Error adicionando colaborador: ' + error));
   };
 
   return (
     <div className="employee-overlay">
       <div className="employee-container">
         <button className="close-btn" onClick={onCloseOverlay}>X</button>
-        <h1>Add an Employee</h1>
+        <h1>Adicionar colaborador</h1>
         <div>
           <input
             type="text"
@@ -63,7 +63,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onAddSuccess, onCloseOverlay 
           />
         </div>
         {error && <div className="employee-error">{error}</div>}
-        <button id="addEmployee" onClick={handleAddEmployee}>Add Employee</button>
+        <button id="addEmployee" onClick={handleAddEmployee}>Adicionar colaborador</button>
       </div>
     </div>
   );

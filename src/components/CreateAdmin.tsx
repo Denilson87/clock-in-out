@@ -48,8 +48,8 @@ const CreateAdmin: React.FC<CreateAdminProps> = ({ onCreateSuccess, onCloseOverl
     <div className="login-overlay">
       <div className="login-container">
         <button className="close-btn" onClick={onCloseOverlay}>X</button>
-        <h1 id="createAcc">Create an Admin Account</h1>
-        <small>This app requires an admin account.</small>
+        <h1 id="createAcc">Criar a conta do administrador</h1>
+        <small>Esta plataforma precisa de um utilizador administrador.</small>
         <div id="username">
           <input
             type="text"
@@ -75,7 +75,7 @@ const CreateAdmin: React.FC<CreateAdminProps> = ({ onCreateSuccess, onCloseOverl
           />
         </div>
         {error && <div className="login-error">{error}</div>}
-        <button id="createAdmin" onClick={handleCreateAdmin}>Create Admin</button>
+        <button id="createAdmin" onClick={handleCreateAdmin}>Criar administrador</button>
       </div>
     </div>
   );

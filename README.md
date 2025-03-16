@@ -10,10 +10,6 @@ A simple web-based employee time clock application built with React.
 
 1. **Clone the Repository**
 
-   ```bash
-   git clone https://github.com/judahpaul16/employee-time-clock.git
-   cd employee-time-clock
-   ```
    
 2. **Install Dependencies**
 
@@ -66,6 +62,9 @@ A simple web-based employee time clock application built with React.
    fi
    
    rm -rf 'employee-time-clock/'
-   git clone https://github.com/judahpaul16/employee-time-clock.git
+   git clone 
    cd employee-time-clock
    npm i && npm rebuild bcrypt --build-from-source && npm run build && mkdir ./tmp && touch ./tmp/restart.txt
+
+TIPS:
+"Para garantir que cada utilizador use apenas o seu codigo e nigeum autentise por si vamos garantir que o pin steja saved no local storage. and then every one will only need to click Entrada or Saida"
