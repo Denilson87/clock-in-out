@@ -15,11 +15,20 @@ const App: React.FC = () => {
   // const [pin, setPin] = useState(''); // State to store the PIN
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString()); // State to store the current time
   const [showAddEmployee, setShowAddEmployee] = useState(false); // State to control showing addEmployee
-  const [timeCardRecords, setTimeCardRecords] = useState<{ id: number; name: string; pin: string; action: string; time: string; ip: string }[]>([]);  // State to store the time card records
+  const [timeCardRecords, setTimeCardRecords] = useState<{ 
+    id: number; 
+    name: string; 
+    pin: string; 
+    action: string; 
+    date: string;  // Adicionando a propriedade 'date'
+    time: string; 
+    atraso: string;  
+    atrasoMinutos: number;  
+    ip: string;
+  }[]>([]);
   const [employeeStatus, setEmployeeStatus] = useState<{ [pin: string]: string }>({}); // State to store the employee status
   const isOverlayShowing = showCreateAdmin || showLogin || showAddEmployee; // State to check if an overlay is showing
   const [lastInteractionTime, setLastInteractionTime] = useState(new Date()); // State to track the last interaction time
-
 
   const [pin, setPin] = useState(() => {
     // Retrieve the pin from localStorage when the component loads
@@ -262,7 +271,7 @@ fetch('/add-record', {
       ...employeeStatus,
       [pin]: selectedAction,
     });
-    setTimeCardRecords([...timeCardRecords, { id: data.id, name: data.name, pin, action: record.action, time: record.time, ip: ip }]);
+    setTimeCardRecords([ ...timeCardRecords, { id: data.id, name: data.name, pin, action: record.action, date: new Date().toISOString().split('T')[0], atraso: data.atraso, time: record.time, ip: ip, atrasoMinutos: data.atrasoMinutos || 0 }, ]);
     setPin(''); // Clearing the PIN
     showMessageToUser('Time recorded successfully', 'success');
   })
@@ -271,6 +280,16 @@ fetch('/add-record', {
     showMessageToUser('Error adding record: ' + error.error, 'error');
   });
 };
+// //id: number;
+// name: string;
+// pin: string;
+// action: string;
+// date:string;
+// time: string;
+// atraso:string;
+// atrasoMinutos:string;
+// us:string;
+// ip: string;
 
 function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' | 'info') {
   const messageContainer = document.getElementById('message-container');
@@ -342,14 +361,14 @@ function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' |
       <h2>Controle de assiduidade</h2>
       <div id="currentTime"><b>Horario local: {currentTime}</b></div>
       <div className="pin-entry">
-      <input
+      {/* <input
         type="password"
         value={pin}
         onChange={(e) => setPin(e.target.value)}
         placeholder="Enter your PIN"
-      />
-      <div id="currentPin">Digite o seu PIN: {"*".repeat(pin.length)}</div>
-        <button className="clear-button" onClick={handleClear}>Clear</button>
+      />  */}
+       {/* <div id="currentPin">Digite o seu PIN: {"*".repeat(pin.length)}</div> */}
+        <button className="clear-button" onClick={handleClear}></button>
       </div>
       <div id="message-container"></div>
       <div className="main-container">

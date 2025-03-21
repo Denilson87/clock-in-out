@@ -8,6 +8,7 @@ const json2csv = require('json2csv').parse;
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+const { time } = require('console');
 
 // Secret key for session, randomly generated
 let SECRET_KEY = crypto.randomBytes(32).toString('hex');
@@ -67,7 +68,7 @@ app.post('/download-records', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         // Convert records to CSV
         const US=" CS Albasine"
-        const fields = ['name', 'pin', 'action', 'time', 'ip', 'US'];
+        const fields = ['name', 'pin', 'action', 'time','Horas','Atraso', 'ip', 'US'];
         const opts = { fields };
         const csv = json2csv(rows, opts);
         // Set the response header
@@ -113,30 +114,67 @@ function getMacAddress() {
 
 // Rota para adicionar registro
 app.post('/add-record', (req, res) => {
-    const { pin, action, time, ip, us } = req.body;
+    const { pin, action, ip } = req.body;
+    
+    // Capturar hora atual
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const formattedTime = `${currentHour}:${currentMinutes < 10 ? '0' : ''}${currentMinutes}`;
 
-    // Capturar o MAC Address
-    const macAddress = getMacAddress();
-    console.log("MAC Address do dispositivo:", macAddress); // Exibir o MAC Address no console
+    // Hora limite (07:30)
+    const limitHour = 7;
+    const limitMinutes =30;
 
-    // Verificar se o usuário com o PIN fornecido existe
+    // Definir status de atraso
+    let status = "Não atrasado";
+    let delayMinutes = 0;
+
+    if (currentHour > limitHour || (currentHour === limitHour && currentMinutes > limitMinutes)) {
+        status = "Atrasado";
+
+        // Calcular a diferença de minutos
+        const nowInMinutes = currentHour * 60 + currentMinutes;
+        const limitInMinutes = limitHour * 60 + limitMinutes;
+        delayMinutes = nowInMinutes - limitInMinutes;
+    }
+
+    // Buscar usuário no banco
     usersDB.findOne({ pin }, (err, user) => {
+        const formattedDate = now.toISOString().split('T')[0]; 
         if (err) return res.status(500).json({ error: err.message });
         if (!user) return res.status(400).json({ error: 'Nenhum utilizador com esse PIN' });
 
-        // Nome do usuário
         const name = user.name;
         const us = "CS Albasine ";
 
-        // Inserir o novo registro com MAC Address
-        recordsDB.insert({ name, pin, action, time, ip, us,  mac: macAddress }, (err, newRecord) => {
+        // Criar registro no banco
+        recordsDB.insert({ 
+            name, 
+            pin, 
+            action, 
+            date:formattedDate,
+            time: formattedTime, 
+            atraso: status, 
+            atrasoMinutos: delayMinutes, 
+            ip, 
+            us
+        }, (err, newRecord) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            // Retornar o novo ID e nome
-            res.status(201).json({ id: newRecord._id, name });
+            res.status(201).json({ 
+                id: newRecord._id, 
+                name, 
+                date:new Date(),
+                time: formattedTime, 
+                atraso: status, 
+                atrasoMinutos: delayMinutes
+            });
         });
     });
 });
+
+
 // Route to login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
