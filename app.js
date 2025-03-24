@@ -8,7 +8,7 @@ const json2csv = require('json2csv').parse;
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
-const { time } = require('console');
+const { time, info } = require('console');
 
 // Secret key for session, randomly generated
 let SECRET_KEY = crypto.randomBytes(32).toString('hex');
@@ -113,7 +113,7 @@ function getMacAddress() {
 
 
 // Rota para adicionar registro
-app.post('/add-record', (req, res) => {
+app.post('/add-record', (req, res) => {   
     const { pin, action, ip } = req.body;
     
     // Capturar hora atual
@@ -123,8 +123,8 @@ app.post('/add-record', (req, res) => {
     const formattedTime = `${currentHour}:${currentMinutes < 10 ? '0' : ''}${currentMinutes}`;
 
     // Hora limite (07:30)
-    const limitHour = 7;
-    const limitMinutes =30;
+    const limitHour = 12;
+    const limitMinutes =50;
 
     // Definir status de atraso
     let status = "Não atrasado";
@@ -178,7 +178,8 @@ app.post('/add-record', (req, res) => {
 // Route to login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    // Find the user in the database
+   
+     // Find the user in the database
     usersDB.findOne({ username }, (err, user) => {
         if (err) return res.status(500).json({ error: err.message });
         // Verify password

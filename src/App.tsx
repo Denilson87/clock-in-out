@@ -308,7 +308,6 @@ function showMessageToUser(text: string, type: 'success' | 'error' | 'warning' |
   }, 3000);
 }
 
-
   function downloadRecords() {
     fetch('/download-records', { method: 'POST' })
       .then((response) => response.blob())
