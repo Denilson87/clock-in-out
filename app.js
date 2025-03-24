@@ -68,7 +68,7 @@ app.post('/download-records', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         // Convert records to CSV
         const US=" CS Albasine"
-        const fields = ['name', 'pin', 'action', 'time','Horas','Atraso', 'ip', 'US'];
+        const fields = ['name', 'action','date', 'time','atraso', 'atrasoMinutos', 'us'];
         const opts = { fields };
         const csv = json2csv(rows, opts);
         // Set the response header
@@ -123,8 +123,8 @@ app.post('/add-record', (req, res) => {
     const formattedTime = `${currentHour}:${currentMinutes < 10 ? '0' : ''}${currentMinutes}`;
 
     // Hora limite (07:30)
-    const limitHour = 12;
-    const limitMinutes =50;
+    const limitHour = 7;
+    const limitMinutes =45;
 
     // Definir status de atraso
     let status = "Não atrasado";
