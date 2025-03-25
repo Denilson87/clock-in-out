@@ -298,7 +298,7 @@ const App: React.FC = () => {
       </div>
       <div id="message-container"></div>
       <div className="main-container">
-        <Keypad onKeyPress={handleKeyPress} />
+        <Keypad onKeyPress={handleKeyPress}/>
       </div>
       <div className="action-buttons">
         <button onClick={() => handleActionClick('Entrada')}>Entrada</button>
