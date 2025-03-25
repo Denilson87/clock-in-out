@@ -36,7 +36,7 @@ A simple web-based employee time clock application built with React.
 - Administrators can log in to the dashboard to view and manage time logs.
 
 <!-- screenshot -->
-![Screenshot](screenshot.png)
+![Screenshot](image.png)
 
 ## Example reclone script for production (Linux + Phusion Passenger)
 

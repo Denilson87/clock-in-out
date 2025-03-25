@@ -69,7 +69,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ records }) => {
                   <td style={{ backgroundColor: uniqueIps[pin].size > 1 ? 'yellow' : 'transparent' }}>
                     {record.ip}
                   </td>
-                  <td>CS Albasine</td>
+                  <td>CS Alto Mae</td>
                 </tr>
               ))}
             </tbody>

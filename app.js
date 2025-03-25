@@ -8,7 +8,7 @@ const json2csv = require('json2csv').parse;
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
-const { time } = require('console');
+const { time, info } = require('console');
 
 // Secret key for session, randomly generated
 let SECRET_KEY = crypto.randomBytes(32).toString('hex');
@@ -67,8 +67,8 @@ app.post('/download-records', (req, res) => {
     recordsDB.find({}, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         // Convert records to CSV
-        const US=" CS Albasine"
-        const fields = ['name', 'pin', 'action', 'time','Horas','Atraso', 'ip', 'US'];
+        const US=" CS Alto Mae"
+        const fields = ['name', 'action','date', 'time','atraso', 'atrasoMinutos', 'us'];
         const opts = { fields };
         const csv = json2csv(rows, opts);
         // Set the response header
@@ -113,7 +113,7 @@ function getMacAddress() {
 
 
 // Rota para adicionar registro
-app.post('/add-record', (req, res) => {
+app.post('/add-record', (req, res) => {   
     const { pin, action, ip } = req.body;
     
     // Capturar hora atual
@@ -122,12 +122,12 @@ app.post('/add-record', (req, res) => {
     const currentMinutes = now.getMinutes();
     const formattedTime = `${currentHour}:${currentMinutes < 10 ? '0' : ''}${currentMinutes}`;
 
-    // Hora limite (07:30)
+    // Hora limite (07:45)
     const limitHour = 7;
-    const limitMinutes =30;
+    const limitMinutes =45;
 
     // Definir status de atraso
-    let status = "Não atrasado";
+    let status = "Nao atrasado";
     let delayMinutes = 0;
 
     if (currentHour > limitHour || (currentHour === limitHour && currentMinutes > limitMinutes)) {
@@ -146,7 +146,7 @@ app.post('/add-record', (req, res) => {
         if (!user) return res.status(400).json({ error: 'Nenhum utilizador com esse PIN' });
 
         const name = user.name;
-        const us = "CS Albasine ";
+        const us = "CS Alto Mae";
 
         // Criar registro no banco
         recordsDB.insert({ 
@@ -178,7 +178,8 @@ app.post('/add-record', (req, res) => {
 // Route to login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    // Find the user in the database
+   
+     // Find the user in the database
     usersDB.findOne({ username }, (err, user) => {
         if (err) return res.status(500).json({ error: err.message });
         // Verify password
